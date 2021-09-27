@@ -49,6 +49,13 @@ def re_Square(root,file):
     if '0.6, 0.12).png' in file or '0.6, 0.06).png' in file or '0.6, 0.09).png' in file:
         print(file)
         os.remove(os.path.join(root,file))
+def re_SimBA(root,file):
+    if 'ILSVRC2012' in file:
+        os.remove(os.path.join(root,file))
+        return None
+    if ').png' not in file:
+        print(file)
+        os.remove(os.path.join(root,file))
 
     # new_name=pre+med+pos
     # rename_(root,file,new_name)
@@ -76,5 +83,8 @@ def rename(root,scheme):
     elif scheme=='Square':
         for file in files:
             re_Square(root,file)
+    elif scheme=='SimBA':
+        for file in files:
+            re_SimBA(root,file)
 if __name__=='__main__':
-    rename('D:\\adata\\论文\\dataset\\adversarial examples for IQA\\Square','Square')
+    rename('D:\\adata\\论文\\dataset\\adversarial examples for IQA\\SimBA','SimBA')
