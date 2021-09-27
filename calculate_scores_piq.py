@@ -35,7 +35,6 @@ def get_ref_images(root):
             ref_names=pickle.load(f)
         print(f'load ref_names from ./ref_names.txt')
     return ref_names
-
 class AEData(Dataset):
     def __init__(self,ref_root,ae_root,ae_method,transform):
         """[summary]
@@ -104,7 +103,8 @@ def calculate_score(loader,csv_file,batch_size,cols):
     dic={}
     for metric in cols:
         dic[metric]=[]
-    for _,(ref,aes,_,ae_names) in enumerate(loader):
+    for id,(ref,aes,_,ae_names) in enumerate(loader):
+        print(id,len(ae_names))
         ae_count=len(ae_names)
         refs=ref.repeat(ae_count,1,1,1)
         aes=torch.cat(aes)
