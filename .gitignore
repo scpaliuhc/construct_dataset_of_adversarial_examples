@@ -1,2 +1,3 @@
-./generated/*
-./ref/*
+./generated/
+./ref/
+./resize_voc_pascal/
