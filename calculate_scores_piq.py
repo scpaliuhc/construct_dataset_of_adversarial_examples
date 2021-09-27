@@ -106,6 +106,8 @@ def calculate_score(loader,csv_file,batch_size,cols):
     for metric in cols:
         dic[metric]=[]
     for id,(ref,aes,_,ae_names) in enumerate(loader):
+        if id>0:
+            init=False
         print(id,len(ae_names))
         ae_count=len(ae_names)
         refs=ref.repeat(ae_count,1,1,1)
@@ -113,7 +115,6 @@ def calculate_score(loader,csv_file,batch_size,cols):
         if useGPU:
             aes=aes.to('cuda')
             refs=refs.to('cuda')
-
         for i in range(ae_count):
             ae_names[i]=ae_names[i][0]
         for i in range(0,ae_count,batch_size):
