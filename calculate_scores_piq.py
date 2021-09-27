@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 '''
 Filename         :calculate_scores_piq.py
-Description      :
+Description      :use build-in functions (['ssim','ms_ssim','psnr','vif_p','vsi','fsim','gmsd','ms_gmsd','haarpsi','mdsi'])                 of piq to calculate scores and produce a csv file e.g. ./scores/BIM_piq.csv
 Time             :2021/09/27 19:02:16
-Author           :***
+Author           :hc liu
 Version          :1.0
 '''
 import csv
@@ -87,7 +87,6 @@ class AEData(Dataset):
             ae_imgs.append(ae_img)
         
         return ref_img,ae_imgs,self.ref_names[index],sel_files
-
 def calculate_score_(names,refs,aes,cols):
     tmp_dic={'file':names}
     for func in cols:
@@ -119,11 +118,7 @@ def calculate_score(loader,csv_file,batch_size,cols):
                 d.to_csv(csv_file,index=False,sep=',',mode='a')
                 init=False
             else:
-                d.to_csv(csv_file,index=False,sep=',',mode='a',header=None)
-               
-              
-          
-               
+                d.to_csv(csv_file,index=False,sep=',',mode='a',header=None)                      
 def main(args):
     tran=transforms.Compose([transforms.ToTensor()])
     aedata=AEData(args.ref,args.adv,args.method,tran)
@@ -140,92 +135,6 @@ if __name__=='__main__':
     parser.add_argument("--batchSize", type=int, default=10, help="")
     args = parser.parse_args()
     main(args)
-
-    # tran=transforms.Compose([transforms.ToTensor()])
-    # aedata=AEData('D:\\adata\\论文\\dataset\\adversarial examples for IQA\REF_VOC',
-    # 'D:\\adata\\论文\\dataset\\adversarial examples for IQA',
-    # 'BIM',tran)
-    # loader=DataLoader(aedata,1,False)
-    # batch=5
-    # init=True
-    # cols=['names','ssim','ms_ssim','psnr','vif_p','vsi','fsim','gmsd','ms_gmsd','haarpsi','mdsi']
-    # dic={}
-    # for metric in cols:
-    #     dic[metric]=[]
-
-    # for id,(ref,aes,ref_name,ae_names) in enumerate(loader):
-    #     ae_count=len(ae_names)
-    #     refs=ref.repeat(ae_count,1,1,1)
-    #     aes=torch.cat(aes)
-    #     for i in range(ae_count):
-    #         ae_names[i]=ae_names[i][0]
-
-    #     for i in range(0,ae_count,5):
-    #             ssim=piq.ssim(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             ms_ssim=piq.multi_scale_ssim(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             print(ssim)
-    #             print(ms_ssim)
-    #             print(ae_names[i:(i+1)*5])
-    #             psnr=piq.psnr(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             # vif=piq.vif(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             vif_p=piq.vif_p(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             vsi=piq.vsi(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             fsim=piq.fsim(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             gmsd=piq.gmsd(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             ms_gmsd=piq.multi_scale_gmsd(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             haarpsi=piq.haarpsi(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             mdsi=piq.mdsi(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-    #             # fid=piq.fid(refs[i:(i+1)*5],aes[i:(i+1)*5],reduction='none')
-                
-    #             #torch tensor to numpy
-    #             dic['ssim'].append(ssim.numpy())
-    #             dic['ms-ssim'].append(ms_ssim.numpy())
-    #             dic['psnr'].append(psnr.numpy())
-    #             dic['vif-p'].append(vif_p.numpy())
-    #             dic['vsi'].append(vsi.numpy())
-    #             dic['fsim'].append(fsim.numpy())
-    #             dic['gmsd'].append(gmsd.numpy())
-    #             dic['ms-gmsd'].append(ms_gmsd.numpy())
-    #             dic['haarpsi'].append(haarpsi.numpy())
-    #             dic['mdsi'].append(mdsi.numpy())
-    #             dic['names']+=ae_names[i:(i+1)*5]
-    #             d=pd.DataFrame({'name':ae_names[i:(i+1)*5],
-    #                            'ssim':ssim.numpy(),
-    #                            'ms-ssim':ms_ssim.numpy(),
-    #                            'psnr':psnr.numpy(),
-    #                            'vif-p':vif_p.numpy(),
-    #                            'vsi':vsi.numpy(),
-    #                            'fsim':fsim.numpy(),
-    #                            'gmsd':gmsd.numpy(),
-    #                            'ms-gmsd':ms_gmsd.numpy(),
-    #                            'haarpsi':haarpsi.numpy(),
-    #                            'mdsi':mdsi.numpy()})
-    #             if init:
-    #                 d.to_csv("test.csv",index=False,sep=',',mode='a')
-    #                 init=False
-    #             else:
-    #                 d.to_csv("test.csv",index=False,sep=',',mode='a',header=None)
-                
-    # # d=pd.DataFrame({'name':ae_names,
-    # #                            'ssim':numpy.concatenate(dic['ssim']),
-    # #                            'ms-ssim':numpy.concatenate(dic['ms-ssim']),
-    # #                            'psnr':numpy.concatenate(dic['psnr']),
-    # #                            'vif-p':numpy.concatenate(dic['vif-p']),
-    # #                            'vsi':numpy.concatenate(dic['vsi']),
-    # #                            'fsim':numpy.concatenate(dic['fsim']),
-    # #                            'gmsd':numpy.concatenate(dic['gmsd']),
-    # #                            'ms-gmsd':numpy.concatenate(dic['ms-gmsd']),
-    # #                            'haarpsi':numpy.concatenate(dic['haarpsi']),
-    # #                            'mdsi':numpy.concatenate(dic['mdsi'])})
-    # # d.to_csv("test.csv",index=False,sep=',',mode='a')
-    #             # scores=numpy.stack((ssim,ms_ssim,psnr,vif_p,vsi,fsim,gmsd,ms_gmsd,haarpsi,mdsi,fid))
-    #             # scores=scores.T
-
-    #             #name,['ssim','ms-ssim','psnr','vif-p','vsi','fsim','gmsd','ms-gmsd','haarpsi','mdsi','fid']
-                
-
-    # exit()
-
 
         
 
