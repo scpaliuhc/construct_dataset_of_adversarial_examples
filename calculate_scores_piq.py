@@ -129,7 +129,7 @@ def main(args):
     aedata=AEData(args.ref,args.adv,args.method,tran)
     loader=DataLoader(aedata,1,False)
     funcs=['ssim','ms_ssim','psnr','vif_p','vsi','fsim','gmsd','ms_gmsd','haarpsi','mdsi']
-    calculate_score(loader,f'socres_{args.method}.csv',args.batchSize,funcs)
+    calculate_score(loader,f'./scores/{args.method}_piq.csv',args.batchSize,funcs)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(usage="it's usage tip.", description="help info.")
