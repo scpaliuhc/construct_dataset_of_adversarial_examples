@@ -84,13 +84,17 @@ class AEData(Dataset):
         
         return ref_img,ae_imgs,self.ref_names[index],sel_files
 def calculate_score_(names,refs,aes,cols):
+    global useGPU
     tmp_dic={'file':names}
     for func in cols:
         metr=func
         try:
             if "ms_" == func[0:3]:
                 func="multi_scale_"+func[3:]
-            tmp_dic[metr]=eval('piq.'+func)(refs,aes,reduction='none').numpy()
+            if useGPU:
+                tmp_dic[metr]=eval('piq.'+func)(refs,aes,reduction='none').cpu().detach().numpy()
+            else:
+                tmp_dic[metr]=eval('piq.'+func)(refs,aes,reduction='none').numpy()
         except:
             print(func)
             exit()
@@ -98,6 +102,7 @@ def calculate_score_(names,refs,aes,cols):
 def calculate_score(loader,csv_file,batch_size,cols):
     init=True
     dic={}
+    global useGPU
     for metric in cols:
         dic[metric]=[]
     for id,(ref,aes,_,ae_names) in enumerate(loader):
@@ -105,6 +110,10 @@ def calculate_score(loader,csv_file,batch_size,cols):
         ae_count=len(ae_names)
         refs=ref.repeat(ae_count,1,1,1)
         aes=torch.cat(aes)
+        if useGPU:
+            aes=aes.to('cuda')
+            refs=refs.to('cuda')
+
         for i in range(ae_count):
             ae_names[i]=ae_names[i][0]
         for i in range(0,ae_count,batch_size):
@@ -127,11 +136,15 @@ def main(args):
 if __name__=='__main__':
     parser = argparse.ArgumentParser(usage="it's usage tip.", description="help info.")
     parser.add_argument("--method", required=True ,type=str, choices=['FGSM','BIM','PGD','CW','DeepFool','OnePixel','Square','SparseFool','Boundary','SimBA','AdvPatch','GAP','NES'], help="the attack method.")
-    parser.add_argument("--gpu", type=str, default='0', help="the id of the last image.")
     parser.add_argument("--ref", type=str, default='D:\\adata\\论文\\dataset\\adversarial examples for IQA\REF_VOC', help="")
     parser.add_argument("--adv", type=str, default='D:\\adata\\论文\\dataset\\adversarial examples for IQA', help="")
     parser.add_argument("--batchSize", type=int, default=10, help="")
+    parser.add_argument("--gpu", type=int, default=1, help="")
     args = parser.parse_args()
+    os.environ['CUDA_VISIBLE_DEVICES'] = f'{args.gpu}' 
+    useGPU=False
+    if torch.cuda.is_available():
+        useGPU=True
     main(args)
 
         
