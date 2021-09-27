@@ -51,12 +51,9 @@ class AEData(Dataset):
         self.ae_root=ae_root
         self.ae_mth=ae_method
         self.trans=transform
-        # self.params=params
-
         self.ref_names=get_ref_images(ref_root)
-        # print(self.ref_root,self.ref_names[0])
         self.ae_names=os.listdir(os.path.join(self.ae_root,self.ae_mth))
-
+        self.ae_names.sort()
     def __len__(self):
         return len(self.ref_names)
 
@@ -122,6 +119,7 @@ def calculate_score(loader,csv_file,batch_size,cols):
 def main(args):
     tran=transforms.Compose([transforms.ToTensor()])
     aedata=AEData(args.ref,args.adv,args.method,tran)
+    # exit(0)
     loader=DataLoader(aedata,1,False)
     funcs=['ssim','ms_ssim','psnr','vif_p','vsi','fsim','gmsd','ms_gmsd','haarpsi','mdsi']
     calculate_score(loader,f'./scores/{args.method}_piq.csv',args.batchSize,funcs)
