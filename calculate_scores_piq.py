@@ -112,7 +112,7 @@ def calculate_score(loader,csv_file,batch_size,cols):
         for i in range(ae_count):
             ae_names[i]=ae_names[i][0]
         for i in range(0,ae_count,batch_size):
-            tmp_dic=calculate_score_(ae_names[i:(i+1)*5],refs[i:(i+1)*5],aes[i:(i+1)*5],cols)
+            tmp_dic=calculate_score_(ae_names[i:(i+1)*batch_size],refs[i:(i+1)*batch_size],aes[i:(i+1)*batch_size],cols)
             
             d=pd.DataFrame(tmp_dic)
             if init:
