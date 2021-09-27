@@ -145,6 +145,7 @@ if __name__=='__main__':
     useGPU=False
     if torch.cuda.is_available():
         useGPU=True
+        print(f'use GPU and the id is {args.gpu}')
     main(args)
 
         
