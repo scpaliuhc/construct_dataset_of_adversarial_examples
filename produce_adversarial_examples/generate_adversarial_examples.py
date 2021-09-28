@@ -280,9 +280,6 @@ def main(args):
     attack_torchattacks(model,args,images_,labels_,files_)
 
 
-
-
-
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(usage="it's usage tip.", description="help info.")
