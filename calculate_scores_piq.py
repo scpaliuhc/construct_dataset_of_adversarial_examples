@@ -77,11 +77,14 @@ class AEData(Dataset):
                 found=False
         
         ae_imgs=[]
-        for file in sel_files:
-            ae_img=Image.open(os.path.join(os.path.join(self.ae_root,self.ae_mth,file)))
-            ae_img=self.trans(ae_img)
-            ae_imgs.append(ae_img)
-        
+        try:
+            for file in sel_files:
+                ae_img=Image.open(os.path.join(os.path.join(self.ae_root,self.ae_mth,file)))
+                ae_img=self.trans(ae_img)
+                ae_imgs.append(ae_img)
+        except:
+            print(f"An error happened on {file}, the corresponding ref file {self.ref_names[index]}")
+            exit()
         return ref_img,ae_imgs,self.ref_names[index],sel_files
 def calculate_score_(names,refs,aes,cols):
     global useGPU
@@ -99,16 +102,18 @@ def calculate_score_(names,refs,aes,cols):
             print(func)
             exit()
     return tmp_dic
-def calculate_score(loader,csv_file,batch_size,cols):
-    init=True
-    dic={}
+def calculate_score(loader,csv_file,batch_size,cols,mth):
+    global init
     global useGPU
+    dic={}
     for metric in cols:
         dic[metric]=[]
-    for id,(ref,aes,_,ae_names) in enumerate(loader):
-        if id>0:
-            init=False
-        print(id,len(ae_names))
+    
+    error_files=[]
+    for id,(ref,aes,ref_name,ae_names) in enumerate(loader):
+        print(mth,id,ref_name[0],len(ae_names))
+        if len(ae_names)<11:
+            error_files.append(ref_name[0])
         ae_count=len(ae_names)
         refs=ref.repeat(ae_count,1,1,1)
         aes=torch.cat(aes)
@@ -125,14 +130,26 @@ def calculate_score(loader,csv_file,batch_size,cols):
                 d.to_csv(csv_file,index=False,sep=',',mode='a')
                 init=False
             else:
-                d.to_csv(csv_file,index=False,sep=',',mode='a',header=None)                      
+                d.to_csv(csv_file,index=False,sep=',',mode='a',header=None)     
+    print('error files \n',error_files)                 
 def main(args):
     tran=transforms.Compose([transforms.ToTensor()])
     aedata=AEData(args.ref,args.adv,args.method,tran)
-    # exit(0)
     loader=DataLoader(aedata,1,False)
     funcs=['ssim','ms_ssim','psnr','vif_p','vsi','fsim','gmsd','ms_gmsd','haarpsi','mdsi']
-    calculate_score(loader,f'./scores/{args.method}_piq.csv',args.batchSize,funcs)
+    csv_file=f'./scores/{args.method}_piq.csv'
+    if os.path.exists(csv_file):
+        print(csv_file, 'has been created. Append?[y/n]')
+        yn=input()
+        if yn=='y':
+            init=True
+        elif yn=='n':
+            exit('stop calculation')
+        else:
+            raise('error input [y/n]')
+    else:
+        init=False
+    calculate_score(loader,csv_file,args.batchSize,funcs,args.method)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(usage="it's usage tip.", description="help info.")

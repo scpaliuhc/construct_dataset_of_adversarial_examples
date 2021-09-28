@@ -23,7 +23,7 @@ def attack_torchattacks(model,args,images,labels,files):
         raise NotImplementedError
     
     method=args.method
-    root=f"/data/lhc/IQA_dataset/{method}"
+    root=f"/data0/lhc/dataset/IQA_AE/AE/CLS/{method}"
     try: os.makedirs(root)
     except: None
   
@@ -143,12 +143,13 @@ def attack_torchattacks(model,args,images,labels,files):
             print(f'end. success rate {succ*100:.2f}% {time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())}\n')
     #Boundary foolbox
     elif method=='Boundary':
-        params=[1500,3000,3500,4000]#2000,2500,
+        params=[100,500,1000,1500,2000,2500,3000,3500,4000,5000,15000]#2000,2500,
         #[100,500,1000,5000,15000,20000,25000,30000]#[300,500,700,900,1200,1500,2000,3000,5000,10000,15000,20000]#[300,500,700,900,1200,1500,2000]
         for pa in params:
             steps=pa
             print(f'start attack: {method}\t step:{pa} {time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())}')
             atk=fatk.boundary_attack.BoundaryAttack(steps=steps)
+            # succ=attack_f_single(model,atk,images,labels,files,method,pa,root)
             succ=attack_f(model,atk,images,labels,files,beg=args.beg,end=args.end,method=method,pa=pa,root=root)
             print(f'end. success rate {succ*100:.2f}% {time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())}')
     #NES
@@ -158,7 +159,7 @@ def attack_torchattacks(model,args,images,labels,files):
         from simba import SimBA
         atk=SimBA(model,'imagenet',512)
         # params=[0.03,0.06,0.1,0.2,0.3]
-        params=[(30,100),(30,500)]#[(0.3,100),(0.3,500)]
+        params=[(0.3,100),(0.3,500),(3,100),(3,500),(30,100),(30,500)]
         
         files=files[args.beg:args.end]
         images=images[args.beg:args.end].cpu()
@@ -229,6 +230,15 @@ def attack_f(model,atk,images,labels,files,beg,end,method,pa,root,batch_size=10)
         succ.append(sus[0].item())
     return np.mean(succ)
 
+def attack_f_single(model,atk,images,labels,files,method,pa,root):
+    raw_advs, clipped_advs, success=atk(model,images,labels,epsilons=[None])
+    name=files[0][:-4]
+    filename=f'{name}_{method}_{pa}.png'
+    img=raw_advs[0].raw.cpu().numpy()[0].transpose(1,2,0)
+    imageio.imsave(os.path.join(root,filename), img_as_ubyte(img))
+    sus=success.float32().mean(axis=-1)
+    return sus[0].item()
+
 
 
 def main(args):
@@ -236,6 +246,25 @@ def main(args):
     model=load_target_model(type='torchattacks')
     from utils import load_images
     images_,labels_,files_=load_images(root=args.REF,model=model)
+    
+    if args.errors:
+        lis_images=[]
+        lis_labels=[]
+        lis_files=[]
+        errors=['2009_004709.jpg', '2011_000249.jpg']
+        for i in range(len(files_)):
+            if files_[i] in errors:
+                print(f'find {files_[i]}')
+                lis_images.append(images_[i].unsqueeze(0))
+                lis_labels.append(labels_[i])
+                lis_files.append(files_[i])
+                if len(lis_files)==len(errors):
+                    break
+        images_=torch.cat(lis_images)
+        labels_=torch.tensor(lis_labels)
+        files_=lis_files
+
+
     images_=images_.to('cuda')
     labels_=labels_.to('cuda')
     
@@ -252,18 +281,19 @@ def main(args):
 
 
 
-import argparse
+
 
 if __name__ == "__main__":
-    
+    import argparse
     parser = argparse.ArgumentParser(usage="it's usage tip.", description="help info.")
     parser.add_argument("--method", required=True ,type=str, choices=['FGSM','BIM','PGD','CW','DeepFool','OnePixel','Square','SparseFool','Boundary','SimBA','SimBA-DCT'], help="the attack method.")
     parser.add_argument("--beg", type=int,default=0, help="the id of the first image")
     parser.add_argument("--end", type=int, default=387, help="the id of the last image.")
     parser.add_argument("--gpu", type=str, default='0', help="the id of the last image.")
     parser.add_argument("--tool", type=str, required=True,choices=['foolbox','torchattacks'], help="")
-    parser.add_argument("--REF", type=str, default='/home/lhc/IQA/dataset/REF_VOC', help="")
+    parser.add_argument("--REF", type=str, default='/data0/lhc/dataset/IQA_AE/REF/REF_VOC', help="")
     parser.add_argument("--batch", type=int, default=10, help="")
+    parser.add_argument("--errors",type=bool,default=False)
     args = parser.parse_args()
     os.environ ['CUDA_VISIBLE_DEVICES'] = args.gpu
     main(args)
