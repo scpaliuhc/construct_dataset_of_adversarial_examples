@@ -153,7 +153,7 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(usage="it's usage tip.", description="help info.")
-    parser.add_argument("--method", required=True ,type=str, choices=['FGSM','BIM','PGD','CW','DeepFool','OnePixel','Square','SparseFool','Boundary','SimBA','AdvPatch','GAP','NES'], help="the attack method.")
+    parser.add_argument("--method", required=True ,type=str, choices=['FGSM','BIM','PGD','CW','DeepFool','OnePixel','Square','SparseFool','Boundary','SimBA','AdvPatch','GAP','NES','Daedalus'], help="the attack method.")
     parser.add_argument("--ref", type=str, default='D:\\adata\\论文\\dataset\\adversarial examples for IQA\REF_VOC', help="")
     parser.add_argument("--adv", type=str, default='D:\\adata\\论文\\dataset\\adversarial examples for IQA', help="")
     parser.add_argument("--batchSize", type=int, default=10, help="")

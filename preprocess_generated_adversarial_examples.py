@@ -70,6 +70,18 @@ def re_AdvPatch(root,file):
     new_file=pre+med+pos
     print(new_file)
     rename_(root,file,new_file)
+def re_Daedalus(root,file):
+    if 'ILSVRC2012' in file:
+        os.remove(os.path.join(root,file))
+        return None
+    pre=file[0:12]
+    med='Daedalus_'
+    pos=file[12:]
+    new_file=pre+med+pos
+    if '416)' in pos:
+        os.remove(os.path.join(root,file))
+    else:
+        rename_(root,file,new_file)
 def rename(root,scheme):
     files=get_files(root)
     if scheme=='BIM':
@@ -99,5 +111,8 @@ def rename(root,scheme):
     elif scheme=='AdvPatch':
         for file in files:
             re_AdvPatch(root,file)
+    elif scheme=='Daedalus':
+        for file in files:
+            re_Daedalus(root,file)
 if __name__=='__main__':
-    rename('D:\\adata\\paper\\dataset\\adversarial examples for IQA\\AdvPatch','AdvPatch')
+    rename('./generated/Daedalus','Daedalus')
