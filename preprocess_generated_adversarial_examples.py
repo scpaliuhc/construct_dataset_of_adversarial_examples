@@ -41,7 +41,6 @@ def re_NES(root,file):
         med='NES-pi'
     new_name=pre+med+pos
     rename_(root,file,new_name)
-
 def re_Square(root,file):
     if 'ILSVRC2012' in file:
         os.remove(os.path.join(root,file))
@@ -59,7 +58,18 @@ def re_SimBA(root,file):
 
     # new_name=pre+med+pos
     # rename_(root,file,new_name)
+def re_AdvPatch(root,file):
 
+    if 'ILSVRC2012' in file:
+        os.remove(os.path.join(root,file))
+        return None
+    pre=file[0:12]
+    size=float(file.split('(')[-1].split(')')[0].split(',')[3].split('=')[-1])
+    med=f'AdvPatch_{size}'
+    pos='.png'
+    new_file=pre+med+pos
+    print(new_file)
+    rename_(root,file,new_file)
 def rename(root,scheme):
     files=get_files(root)
     if scheme=='BIM':
@@ -86,5 +96,8 @@ def rename(root,scheme):
     elif scheme=='SimBA':
         for file in files:
             re_SimBA(root,file)
+    elif scheme=='AdvPatch':
+        for file in files:
+            re_AdvPatch(root,file)
 if __name__=='__main__':
-    rename('D:\\adata\\论文\\dataset\\adversarial examples for IQA\\SimBA','SimBA')
+    rename('D:\\adata\\paper\\dataset\\adversarial examples for IQA\\AdvPatch','AdvPatch')
