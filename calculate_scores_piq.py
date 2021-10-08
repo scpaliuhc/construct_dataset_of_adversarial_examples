@@ -102,8 +102,7 @@ def calculate_score_(names,refs,aes,cols):
             print(func)
             exit()
     return tmp_dic
-def calculate_score(loader,csv_file,batch_size,cols,mth):
-    global init
+def calculate_score(loader,csv_file,batch_size,cols,mth,init):
     global useGPU
     dic={}
     for metric in cols:
@@ -138,6 +137,7 @@ def main(args):
     loader=DataLoader(aedata,1,False)
     funcs=['ssim','ms_ssim','psnr','vif_p','vsi','fsim','gmsd','ms_gmsd','haarpsi','mdsi']
     csv_file=f'./scores/{args.method}_piq.csv'
+    # init=False
     if os.path.exists(csv_file):
         print(csv_file, 'has been created. Append?[y/n]')
         yn=input()
@@ -149,7 +149,7 @@ def main(args):
             raise('error input [y/n]')
     else:
         init=False
-    calculate_score(loader,csv_file,args.batchSize,funcs,args.method)
+    calculate_score(loader,csv_file,args.batchSize,funcs,args.method,init)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(usage="it's usage tip.", description="help info.")
