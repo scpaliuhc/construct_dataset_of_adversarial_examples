@@ -17,7 +17,7 @@ def calculate_MAD_append():
         r=eng.MAD_index(os.path.join(sys.argv[2],ref_name),
                         os.path.join(sys.argv[3],sys.argv[1],ae_name))
         MAD.append(r['MAD'])
-        print(sys.argv[1],f'{(id+1)/count*100:.2f}\%',file,r['MAD'])
+        print(sys.argv[1],f'{(id+1)/count*100:.2f}%',file,r['MAD'])
         # df['mad']=r['MAD']
     MAD=np.array(MAD)
     df['mad']=MAD
