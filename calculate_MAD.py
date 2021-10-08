@@ -20,5 +20,5 @@ def calculate_MAD_append():
     MAD=np.array(MAD)
 
     df['mad']=MAD
-    df.to_csv(f'scores_1/{sys.argv[1]}.csv')
+    df.to_csv(f'scores_1/{sys.argv[1]}.csv',index=False)
 calculate_MAD_append()
