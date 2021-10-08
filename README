@@ -1,0 +1,6 @@
+Guides of Calculate MAD
+if needed, compile the mexfiles: 'mex ical_stat.c' and 'mex ical_std.c'
+The mex is under the path matlabroot/bin
+python 3.6 is ok (the Matlab lib does not support python3.7)
+
+
