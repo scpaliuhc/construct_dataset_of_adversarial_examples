@@ -6,6 +6,7 @@ Time             :2021/09/27 19:02:16
 Author           :hc liu
 Version          :1.0
 '''
+
 import csv
 import os
 import pickle
@@ -19,8 +20,6 @@ import PIL.Image as Image
 import piq
 import pandas as pd
 import argparse
-
-
 
 def get_ref_images(root):
     if not os.path.exists('./ref_names.txt'):
@@ -111,8 +110,8 @@ def calculate_score(loader,csv_file,batch_size,cols,mth,init):
     error_files=[]
     for id,(ref,aes,ref_name,ae_names) in enumerate(loader):
         print(mth,id,ref_name[0],len(ae_names))
-        if len(ae_names)<11:
-            error_files.append(ref_name[0])
+        # if len(ae_names)<11:
+        #     error_files.append(ref_name[0])
         ae_count=len(ae_names)
         refs=ref.repeat(ae_count,1,1,1)
         aes=torch.cat(aes)
@@ -148,7 +147,7 @@ def main(args):
         else:
             raise('error input [y/n]')
     else:
-        init=False
+        init=True
     calculate_score(loader,csv_file,args.batchSize,funcs,args.method,init)
 
 if __name__=='__main__':
