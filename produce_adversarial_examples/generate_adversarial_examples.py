@@ -47,7 +47,7 @@ def attack_torchattacks(model,args,images,labels,files):
             steps=pa[2]
             print(f'start attack: {method} {pa} {time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())}')
             atk=tatk.BIM(model,eps=eps,alpha=alpha,steps=steps)
-            succ=attack_(model,atk,images,labels,files,beg=args.beg,end=args.end,method=method,pa=pa,root=root)
+            succ=attack_(model,atk,images,labels,files,beg=args.beg,end=args.end,method=method,pa=(pa[0],pa[1]),root=root)
             print(f'end. success rate {succ*100:.2f}% {time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())}\n')
     elif method=='PGD':
         params=((0.05,0.005,10),(0.05,0.0025,20),
@@ -251,7 +251,7 @@ def main(args):
         lis_images=[]
         lis_labels=[]
         lis_files=[]
-        errors=['2009_004709.jpg', '2011_000249.jpg']
+        errors=['2011_002265.jpg', '2011_003176.jpg']
         for i in range(len(files_)):
             if files_[i] in errors:
                 print(f'find {files_[i]}')
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     parser.add_argument("--tool", type=str, required=True,choices=['foolbox','torchattacks'], help="")
     parser.add_argument("--REF", type=str, default='/data0/lhc/dataset/IQA_AE/REF/REF_VOC', help="")
     parser.add_argument("--batch", type=int, default=10, help="")
-    parser.add_argument("--errors",type=bool,default=False)
+    parser.add_argument("--errors",type=bool,default=True)
     args = parser.parse_args()
     os.environ ['CUDA_VISIBLE_DEVICES'] = args.gpu
     main(args)

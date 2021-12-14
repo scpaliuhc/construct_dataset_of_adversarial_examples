@@ -31,14 +31,21 @@ def re_NES(root,file):
     if 'ILSVRC2012' in file:
         os.remove(os.path.join(root,file))
         return None
-    if 'NES_query_limited' in file:
-        pre=file.split('NES_query_limited')[0]
-        pos=file.split('NES_query_limited')[-1]
-        med='NES-ql'
-    elif 'NES_parial_info' in file:
-        pre=file.split('NES_parial_info')[0]
-        pos=file.split('NES_parial_info')[-1]
+    if 'NES_lo' in file:
+        pre=file.split('NES_lo')[0]
+        pos=file.split('NES_lo')[-1]
+        med='NES-lo'
+    elif 'NES_pi' in file:
+        pre=file.split('NES_pi')[0]
+        pos=file.split('NES_pi')[-1]
         med='NES-pi'
+    elif 'NES_ql' in file:
+        pre=file.split('NES_ql')[0]
+        pos=file.split('NES_ql')[-1]
+        med='NES-ql'
+    else:
+        print(file)
+        exit()
     new_name=pre+med+pos
     rename_(root,file,new_name)
 def re_Square(root,file):
@@ -115,4 +122,4 @@ def rename(root,scheme):
         for file in files:
             re_Daedalus(root,file)
 if __name__=='__main__':
-    rename('./generated/Daedalus','Daedalus')
+    rename('./generated/NES','NES')
